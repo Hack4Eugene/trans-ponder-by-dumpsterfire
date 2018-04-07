@@ -7,14 +7,9 @@
 */
 	add_action('admin_menu', 'transponder_admin_menu');
 	add_action('admin_enqueue_scripts','shinyStuff');
-	function my_custom_admin_head() {
-		echo "<script src='https://www.google.com/recaptcha/api.js'></script>";
-	}
-	add_action( 'admin_head', 'my_custom_admin_head' );
 	function shinyStuff() {
 		wp_register_style('transponder-admin',plugins_url('style.css',__FILE__ ));
 		wp_enqueue_style('transponder-admin', get_stylesheet_uri() );
-		wp_enqueue_scripts('transponder-admin', 'https://www.google.com/recaptcha/api.js');
 	}
 	function transponder_admin_menu() {
 		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 1 );
@@ -95,6 +90,6 @@
 		<?php
 	}
 	function pending_reviewed($entry, $form) {
-		?> <script>alert("review removed");</script> <?php
+		echo "<h1>WORKS</h1>";
 	}
 ?>
