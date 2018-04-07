@@ -3,7 +3,7 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.1
+*	Version: 0.2
 */
 	function transponder_activate() {
 		global $wpdb;
