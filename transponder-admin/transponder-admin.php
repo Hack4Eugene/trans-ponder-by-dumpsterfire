@@ -82,7 +82,7 @@
 			review_submission($id);
 		} else {
 			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_leads(1);
+			$entries = GFFormsModel::get_lead(1);
 			echo "<script> window.leadData = ".json_encode($entries).";</script>";
 			echo "<div id='formEntries'></div>";
 			?>
@@ -125,7 +125,7 @@
 			review_vol($id);
 		} else {
 			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_leads(3);
+			$entries = GFFormsModel::get_lead(3);
 			echo "<script> window.leadData = ".json_encode($entries).";</script>";
 			echo "<div id='formEntries'></div>";
 			?>
@@ -168,7 +168,13 @@
 		}
 		add_action( 'gform_after_submission_3', 'pending_reviewed', $id, 3 );
 		$formData = $id;
-		$entries = GFFormsModel::get_leads($id);
+		$check = $_GET['id'];
+		$entries = GFFormsModel::get_lead(3); 
+		$lead_id = 6;
+		$lead = RGFormsModel::get_lead( $lead_id ); 
+		$form = GFFormsModel::get_form_meta( $lead[3] );
+		var_dump($form);
+		echo "<script> window.whatData = ".json_encode($form).";</script>";
 		echo "<script> window.leadData = ".json_encode($entries).";</script>";
 		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
 		
@@ -187,9 +193,12 @@
 		if(strcmp($id,'-1') == 0) {
 			return "Nothing to review";
 		}
-		add_action( 'gform_after_submission_5', 'pending_reviewed', $id, 5 );
+		//add_action( 'gform_after_submission_5', 'pending_reviewed', $id, 5 );
 		$formData = $id;
-		$entries = GFFormsModel::get_leads($id);
+		$check = $_GET['id'];
+		var_dump($check);
+		var_Dump($_GET);
+		$entries = GFFormsModel::get_lead(5);
 		echo "<script> window.leadData = ".json_encode($entries).";</script>";
 		echo do_shortcode('[gravityform id="5" title="false" description="false"]');
 		
@@ -205,6 +214,7 @@
 		<?php
 	}
 	function pending_reviewed($entry, $form) {
-		echo "<h1>WORKS</h1>";
+		//echo "<h1>WORKS</h1>";
+		RGFormsModel::save_input($form, $field, $lead, $current_fields, $input_id);
 	}
 ?>
