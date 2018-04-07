@@ -77,12 +77,13 @@
 		}
 	}
 	function transponder_pending() {
+		$entries = GFFormsModel::get_leads(1);
 		if(isset($_GET['id'])){
 			$id = $_GET['id'];
 			review_submission($id);
 		} else {
 			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_lead(1);
+			$entries = GFFormsModel::get_leads(1);
 			echo "<script> window.leadData = ".json_encode($entries).";</script>";
 			echo "<div id='formEntries'></div>";
 			?>
@@ -94,6 +95,7 @@
 				drawTable(leadData);
 			});
 			function drawTable(data) {
+				
 				var heading = jQuery("<tr />");
 				jQuery("#mytable").append(heading);
 				heading.append(jQuery("<td>Submitted At</td>"));
@@ -106,6 +108,7 @@
 				}
 			}
 			function drawRow(rowData) {
+				console.log(rowData);
 				var row = jQuery("<tr />");
 				jQuery("#mytable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
 				row.append(jQuery("<td>" + rowData['date_created'] + "</td>"));
@@ -120,12 +123,13 @@
 		}
 	}
 	function transponder_vol() {
+		$entries = GFFormsModel::get_leads(3);
 		if(isset($_GET['id'])){
 			$id = $_GET['id'];
 			review_vol($id);
 		} else {
 			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_lead(3);
+			$entries = GFFormsModel::get_leads(3);
 			echo "<script> window.leadData = ".json_encode($entries).";</script>";
 			echo "<div id='formEntries'></div>";
 			?>
@@ -137,6 +141,7 @@
 				drawTable(leadData);
 			});
 			function drawTable(data) {
+				
 				var heading = jQuery("<tr />");
 				jQuery("#mytable").append(heading);
 				heading.append(jQuery("<td>Submitted At</td>"));
@@ -149,13 +154,14 @@
 				}
 			}
 			function drawRow(rowData) {
+				console.log(rowData);
 				var row = jQuery("<tr />");
 				jQuery("#mytable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
 				row.append(jQuery("<td>" + rowData['date_created'] + "</td>"));
 				row.append(jQuery("<td>" + rowData[2] + "</td>"));
 				row.append(jQuery("<td>" + rowData[3] + "</td>"));
 				row.append(jQuery("<td>" + rowData[7] + "</td>"));
-				row.append(jQuery("<td><a href='admin.php?page=transponder-admin-settings&edit&id="+rowData['id']+"'>Start</a></td>"));
+				row.append(jQuery("<td><a href='admin.php?page=transponder-admin-settings&id="+rowData['id']+"'>Start</a></td>"));
 			}
 
 		</script>
@@ -166,25 +172,22 @@
 		if(strcmp($id,'-1') == 0) {
 			return "Nothing to review";
 		}
+		$entries = GFFormsModel::get_leads(1);
+		foreach($entries as $entry) {
+			$lead_id = $entry['id'];
+			$lead = RGFormsModel::get_lead( $lead_id ); 
+			if($entry['id'] == $_GET['id']) {
+				echo "<script> window.leadData = ".json_encode($entry).";</script>";
+			}
+		}
 		add_action( 'gform_after_submission_3', 'pending_reviewed', $id, 3 );
-		$formData = $id;
-		$check = $_GET['id'];
-		$entries = GFFormsModel::get_lead(3); 
-		$lead_id = 6;
-		$lead = RGFormsModel::get_lead( $lead_id ); 
-		$form = GFFormsModel::get_form_meta( $lead[3] );
-		var_dump($form);
-		echo "<script> window.whatData = ".json_encode($form).";</script>";
-		echo "<script> window.leadData = ".json_encode($entries).";</script>";
 		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
 		
 		?>
 		<script>
-			leadData.forEach(function (lead) {
-				Object.keys(lead).forEach(function (key) {
-					var fieldId = key.replace('.', '_');
-					jQuery('#input_3_'+fieldId).val(lead[key]);
-				})
+			Object.keys(leadData).forEach(function (key) {
+				var fieldId = key.replace('.', '_');
+				jQuery('#input_3_'+fieldId).val(leadData[key]);
 			})
 		</script>
 		<?php
@@ -193,22 +196,22 @@
 		if(strcmp($id,'-1') == 0) {
 			return "Nothing to review";
 		}
-		//add_action( 'gform_after_submission_5', 'pending_reviewed', $id, 5 );
-		$formData = $id;
-		$check = $_GET['id'];
-		var_dump($check);
-		var_Dump($_GET);
-		$entries = GFFormsModel::get_lead(5);
-		echo "<script> window.leadData = ".json_encode($entries).";</script>";
+		$entries = GFFormsModel::get_leads(3);
+		foreach($entries as $entry) {
+			$lead_id = $entry['id'];
+			$lead = RGFormsModel::get_lead( $lead_id ); 
+			if($entry['id'] == $_GET['id']) {
+				echo "<script> window.leadData = ".json_encode($entry).";</script>";
+			}
+		}
+		add_action( 'gform_after_submission_5', 'pending_reviewed', $id, 5 );
 		echo do_shortcode('[gravityform id="5" title="false" description="false"]');
 		
 		?>
 		<script>
-			leadData.forEach(function (lead) {
-				Object.keys(lead).forEach(function (key) {
-					var fieldId = key.replace('.', '_');
-					jQuery('#input_5_'+fieldId).val(lead[key]);
-				})
+			Object.keys(leadData).forEach(function (key) {
+				var fieldId = key.replace('.', '_');
+				jQuery('#input_5_'+fieldId).val(leadData[key]);
 			})
 		</script>
 		<?php
