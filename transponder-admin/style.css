@@ -1,6 +1,9 @@
 /*
 * Transponder Styles and Shiny Stuff
 */
+ul#adminmenu {
+	margin: 0;
+}
 #toplevel_page_transponder-admin > a > div.wp-menu-image.dashicons-before > img {
     padding: 4px;
 }
