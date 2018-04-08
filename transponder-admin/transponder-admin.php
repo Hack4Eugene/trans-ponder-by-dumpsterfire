@@ -70,8 +70,8 @@
 	}
 	function transponder_admin_menu() {
 		// transponder_admin_menu sets up the admin menu with 2 option. The Admin option is only available to Administrators and Volunteers can't access this
-		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 0 );
-		add_submenu_page('transponder-admin','Pending Submissions','Pending','delete_posts', 'transponder-admin','transponder_pending');
+		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'edit_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 0 );
+		add_submenu_page('transponder-admin','Pending Submissions','Pending','edit_posts', 'transponder-admin','transponder_pending');
 		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_vol');
 	}
 	/*
@@ -119,11 +119,11 @@
 				
 				var heading = jQuery("<tr />");
 				jQuery("#mytable").append(heading);
-				heading.append(jQuery("<td>Submitted At</td>"));
-				heading.append(jQuery("<td>Type of Services</td>"));
-				heading.append(jQuery("<td>Provider Type</td>"));
-				heading.append(jQuery("<td>Provider Name</td>"));
-				heading.append(jQuery("<td>Review</td>"));
+				heading.append(jQuery("<td class='heading'>Submitted At</td>"));
+				heading.append(jQuery("<td class='heading'>Type of Services</td>"));
+				heading.append(jQuery("<td class='heading'>Provider Type</td>"));
+				heading.append(jQuery("<td class='heading'>Provider Name</td>"));
+				heading.append(jQuery("<td class='heading'>Review</td>"));
 				for (var i = 0; i < data.length; i++) {
 					drawRow(data[i]);
 				}
@@ -136,7 +136,7 @@
 				row.append(jQuery("<td>" + rowData[2] + "</td>"));
 				row.append(jQuery("<td>" + rowData[3] + "</td>"));
 				row.append(jQuery("<td>" + rowData[7] + "</td>"));
-				row.append(jQuery("<td><a href='admin.php?page=transponder-admin&id="+rowData['id']+"'>Start</a></td>"));
+				row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin&id="+rowData['id']+"'>Start</a></td>"));
 			}
 
 		</script>
@@ -168,11 +168,11 @@
 				
 				var heading = jQuery("<tr />");
 				jQuery("#mytable").append(heading);
-				heading.append(jQuery("<td>Submitted At</td>"));
-				heading.append(jQuery("<td>Type of Services</td>"));
-				heading.append(jQuery("<td>Provider Type</td>"));
-				heading.append(jQuery("<td>Provider Name</td>"));
-				heading.append(jQuery("<td>Review</td>"));
+				heading.append(jQuery("<td class='heading'>Submitted At</td>"));
+				heading.append(jQuery("<td class='heading'>Type of Services</td>"));
+				heading.append(jQuery("<td class='heading'>Provider Type</td>"));
+				heading.append(jQuery("<td class='heading'>Provider Name</td>"));
+				heading.append(jQuery("<td class='heading'>Review</td>"));
 				for (var i = 0; i < data.length; i++) {
 					drawRow(data[i]);
 				}
@@ -185,7 +185,7 @@
 				row.append(jQuery("<td>" + rowData[2] + "</td>"));
 				row.append(jQuery("<td>" + rowData[3] + "</td>"));
 				row.append(jQuery("<td>" + rowData[7] + "</td>"));
-				row.append(jQuery("<td><a href='admin.php?page=transponder-admin-settings&id="+rowData['id']+"'>Start</a></td>"));
+				row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin-settings&id="+rowData['id']+"'>Start</a></td>"));
 			}
 
 		</script>
