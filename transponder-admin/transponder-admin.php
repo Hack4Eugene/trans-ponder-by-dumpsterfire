@@ -3,8 +3,9 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.2
+*	Version: 0.3
 */
+	require_once("transponder-posts.php");
 	function transponder_activate() {
 		global $wpdb;
 		$sql = "CREATE TABLE IF NOT EXISTS 
@@ -62,7 +63,7 @@
 		wp_enqueue_style('transponder-admin', get_stylesheet_uri() );
 	}
 	function transponder_admin_menu() {
-		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 1 );
+		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 0 );
 		add_submenu_page('transponder-admin','Pending Submissions','Pending','delete_posts', 'transponder-admin','transponder_pending');
 		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_vol');
 	}
@@ -180,7 +181,7 @@
 				echo "<script> window.leadData = ".json_encode($entry).";</script>";
 			}
 		}
-		add_action( 'gform_after_submission_3', 'pending_reviewed', $id, 3 );
+		add_action( 'gform_after_submission_3', 'pending_reviewed', $lead_id, 1 );
 		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
 		
 		?>
@@ -218,6 +219,7 @@
 	}
 	function pending_reviewed($entry, $form) {
 		//echo "<h1>WORKS</h1>";
-		RGFormsModel::save_input($form, $field, $lead, $current_fields, $input_id);
+		$current_fields = array('26' => 'reviewed');
+		RGFormsModel::save_input($form, '26', $entry, $current_fields, '26');
 	}
 ?>
