@@ -263,7 +263,6 @@
 			}
 		}
 		$send_it .= ");";
-		var_dump($send_it);
 	}
 	*/
 	//add_action( 'gform_post_submission_5', 'reviewed5', 10, 2 );
