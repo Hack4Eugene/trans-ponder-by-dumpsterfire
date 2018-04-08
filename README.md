@@ -4,7 +4,6 @@ We are addressing the Trans* Ponder Community Resource Challenge
 
 Team Members:
 
-Lee Ralls             lee@idxbroker.com
 Ben Pearson           ben@idxbroker.com
 Aaron Flager          aaron@idxbroker.com
 Allen McNichols       allen@idxbroker.com
@@ -19,7 +18,10 @@ We are using the following components:
   Gravity Forms
   FlyWheel Hosting
   Ultimate Member
+  User Switching
+  Uncode Theme
+  Custom Plugin Created 
 
 
 
-// Just a Starting Point //
+Further notes regarding that plugin are in the plugin's folder for transponder-admin
