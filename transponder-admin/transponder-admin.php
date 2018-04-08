@@ -5,8 +5,7 @@
 *	Author: Team Dumpsterfire (Hack4acause 2018)
 *	Version: 0.4 (MVP Candidate)
 */
-	require_once("transponder-posts.php"); // Setup Custom Post Type for Approved Submissions
-	
+		
 	/*	Create a custom table to store all submissions after review
 	*	This table contains every field available on the admin 
 	*	view form
@@ -74,6 +73,48 @@
 		add_submenu_page('transponder-admin','Pending Submissions','Pending','edit_posts', 'transponder-admin','transponder_pending');
 		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_vol');
 	}
+	/* DO NOT MODIFY BELOW */
+	/*
+	*	 Setup Custom Post Type for Approved Submissions
+	*/
+	function create_resources_post_type() {
+		$labels = array(
+			'name' => 'Resource Suggestions',
+			'singular_name' => 'Resource Suggestion'
+		);
+		$args = array (
+			'labels' => $labels,
+			'public' => true,
+			'has_archive' => true,
+			'publicly_queryable' => true,
+			'query_var' => true,
+			'rewrite' => true,
+			'capability_type' => 'post',
+			'heirarchical' => false,
+			'menu_icon' => 'dashicons-location-alt',
+			'suppports' => array(
+				'title',
+				'editor',
+				'excerpt',
+				'thumbnail',
+				'revisions',
+		),
+		'taxonomies' => array('category','post_tag'),
+		'menu_position' => 1
+		);
+		register_post_type('resourcesuggestions',$args);
+	}
+	add_action('init','create_resources_post_type');
+	function get_taxonomy_queries( $query ) {
+		if ( ( $query->is_category() || $query->is_tag() )
+			&& $query->is_main_query() ) {
+				$query->set( 'post_type', array( 'post', 'resourcesuggestions' ) );
+		}
+	}
+	add_action( 'pre_get_posts', 'get_taxonomy_queries' );
+	register_taxonomy_for_object_type('category', 'resourcesuggestions');
+	/* DO NOT MODIFY ABOVE */
+	
 	/*
 	*	This function is under development
 	*	Scope: Administrators should be able to add resources without review
@@ -241,8 +282,9 @@
 				var fieldId = key.replace('.', '_');
 				jQuery('#input_5_'+fieldId).val(leadData[key]);
 			});
-			jQuery('#input_5_53').val(leadData[7]);
-			jQuery('#input_5_54').val(leadData[14]);
+			jQuery('#input_5_53').val(leadData[14]);
+			jQuery('#input_5_54').val(leadData[7]);
+			jQuery('#input_5_55').val(leadData[2]);
 		</script>
 		<?php
 	}
