@@ -3,7 +3,7 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.4 (MVP Candidate)
+*	Version: 0.5 (MVP Alpha)
 */
 		
 	/*	Create a custom table to store all submissions after review
