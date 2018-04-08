@@ -27,3 +27,5 @@ Outstanding Issues:
 1. Need to get fields from forms and dump to a custom table for storage
 2. Need to remove submissions from review sections after they have been processed
 3. Styling and adjustments to be more pleasing to work with
+4. Create an archives page to show providers by tag
+5. Pull in more information when creating the published post
