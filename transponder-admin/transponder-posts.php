@@ -1,8 +1,4 @@
 <?php
-/*	
-*	Setup and activate the custom post type we will use to post our approved submissions 
-*	to the website for public view.
-*/	
 add_action('init','create_posttype');
 function create_posttype() {
 	register_post_type( 'Resource Suggestions',
@@ -29,8 +25,8 @@ function create_posttype() {
 add_action( 'init', 'create_client_tax' );
 function create_client_tax() {
     register_taxonomy( 
-            'client_tag',
-            'Resource Suggestions',
+            'client_tag', //your tags taxonomy
+            'Resource Suggestions',  // Your post type
             array( 
                 'hierarchical'  => false, 
                 'label'         => __( 'Tags', CURRENT_THEME ), 

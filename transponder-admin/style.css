@@ -8,12 +8,21 @@ ul#adminmenu {
     padding: 4px;
 }
 #mytable {
-    background: #fff;
     border-collapse: collapse;
 }
 #mytable td {
     border: 1px solid #000;
     padding: 1rem;
+}
+#mytable tr:first-child{
+	background: #ccc !important;
+	font-weight: bold;
+}
+#mytable tr:nth-child(even){
+	background: #f1f1f1;
+}
+#mytable tr:nth-child(odd){
+	background: aliceblue;
 }
 ul.wp-submenu.wp-submenu-wrap {
     margin-left: 0px;
