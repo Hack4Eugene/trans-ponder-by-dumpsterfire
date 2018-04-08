@@ -3,9 +3,15 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.3
+*	Version: 0.4 (MVP Candidate)
 */
-	require_once("transponder-posts.php");
+	require_once("transponder-posts.php"); // Setup Custom Post Type for Approved Submissions
+	
+	/*	Create a custom table to store all submissions after review
+	*	This table contains every field available on the admin 
+	*	view form
+	*/	
+	
 	function transponder_activate() {
 		global $wpdb;
 		$sql = "CREATE TABLE IF NOT EXISTS 
@@ -53,21 +59,27 @@
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;";
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$check = dbDelta($sql);
-		//var_dump($check);
 	}
-	register_activation_hook(__FILE__, 'transponder_activate');
-	add_action('admin_menu', 'transponder_admin_menu');
-	add_action('admin_enqueue_scripts','shinyStuff');
+	register_activation_hook(__FILE__, 'transponder_activate'); // When plugin is activated check and create the table if necessary
+	add_action('admin_menu', 'transponder_admin_menu'); // Add Trans*ponder to the WordPress admin menu
+	add_action('admin_enqueue_scripts','shinyStuff'); // Apply a bit of polish and make things display a little better
 	function shinyStuff() {
+		// shinyStuff brings in our stylesheet so we can style the admin section without having to do a bunch of inline shenanigans
 		wp_register_style('transponder-admin',plugins_url('style.css',__FILE__ ));
 		wp_enqueue_style('transponder-admin', get_stylesheet_uri() );
 	}
 	function transponder_admin_menu() {
+		// transponder_admin_menu sets up the admin menu with 2 option. The Admin option is only available to Administrators and Volunteers can't access this
 		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 0 );
 		add_submenu_page('transponder-admin','Pending Submissions','Pending','delete_posts', 'transponder-admin','transponder_pending');
 		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_vol');
 	}
+	/*
+	*	This function is under development
+	*	Scope: Administrators should be able to add resources without review
+	*	Acceptance Criteria: Admins only, Check if we are editing an existing form or creating a new one, provide admin view of form
 	function transponder_admin() {
+		
 		if(isset($_GET['create'])) {
 
 		} elseif(isset($_GET['edit'])) {
@@ -77,17 +89,25 @@
 			echo do_shortcode('[gravityform id="5" title="false" description="false"]');
 		}
 	}
+	*/
 	function transponder_pending() {
+		/*	
+		*	transponder_pending is the Volunteer review section, admins can use this to look at new submissions as well, that allows
+		*	the review workflow to proceed forward and be vetted before an admin is needed to approve the submission
+		*/	
 		$entries = GFFormsModel::get_leads(1);
 		if(isset($_GET['id'])){
 			$id = $_GET['id'];
 			review_submission($id);
 		} else {
 			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_leads(1);
-			echo "<script> window.leadData = ".json_encode($entries).";</script>";
+			$entries = GFFormsModel::get_leads(1);	// This will grab all of the entries from the community based form
+			echo "<script> window.leadData = ".json_encode($entries).";</script>"; // This outputs a json string we can use on the front end
 			echo "<div id='formEntries'></div>";
 			?>
+		<!--
+			This script sets up the table we need to display those entries to our volunteers within the WordPress dashboard
+		-->
 		<script>
 			var tbl=jQuery("<table/>").attr("id","mytable");
 			jQuery("#formEntries").append(tbl);
@@ -124,6 +144,9 @@
 		}
 	}
 	function transponder_vol() {
+		/*	
+		*	transponder_vol is the admin view and populates the form using the information entered by the community and our volunteer
+		*/	
 		$entries = GFFormsModel::get_leads(3);
 		if(isset($_GET['id'])){
 			$id = $_GET['id'];
@@ -170,7 +193,10 @@
 		}
 	}
 	function review_submission($id) {
-		if(strcmp($id,'-1') == 0) {
+		/*	
+		*	This is our volunteer view, this allows them to review the submission we received and fill out more information as they talk with the provider
+		*/	
+		if(strcmp($id,'-1') == 0) { // There should not be any negative form id's 
 			return "Nothing to review";
 		}
 		$entries = GFFormsModel::get_leads(1);
@@ -181,7 +207,6 @@
 				echo "<script> window.leadData = ".json_encode($entry).";</script>";
 			}
 		}
-		add_action( 'gform_after_submission_3', 'pending_reviewed', $lead_id, 1 );
 		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
 		
 		?>
@@ -194,6 +219,9 @@
 		<?php
 	}
 	function review_vol($id) {
+		/*	
+		*	This is our admin review view that will be populated with the community and volunteer additions if it passed review
+		*/	
 		if(strcmp($id,'-1') == 0) {
 			return "Nothing to review";
 		}
@@ -205,7 +233,6 @@
 				echo "<script> window.leadData = ".json_encode($entry).";</script>";
 			}
 		}
-		add_action( 'gform_after_submission_5', 'pending_reviewed', $id, 5 );
 		echo do_shortcode('[gravityform id="5" title="false" description="false"]');
 		
 		?>
@@ -213,13 +240,31 @@
 			Object.keys(leadData).forEach(function (key) {
 				var fieldId = key.replace('.', '_');
 				jQuery('#input_5_'+fieldId).val(leadData[key]);
-			})
+			});
+			jQuery('#input_5_53').val(leadData[7]);
+			jQuery('#input_5_54').val(leadData[14]);
 		</script>
 		<?php
 	}
-	function pending_reviewed($entry, $form) {
-		//echo "<h1>WORKS</h1>";
-		$current_fields = array('26' => 'reviewed');
-		RGFormsModel::save_input($form, '26', $entry, $current_fields, '26');
+	/*	
+	*	This function will be used to dump the entire form into a table so we can log all submission and view them later as needed
+	*	
+	function reviewed5($entry, $form) {
+		$form_id = $form['id'];
+		$send_it = "INSERT INTO wp_a3t9xkcyny_serviceProviders  (`id`,`lead_id`,`is_provider_submitted`,`service_type`,`medical_type`,`mental_type`,`surgical_type`,`bodywork_type`,`provider_name`,`office_name`,`provider_address`,`provider_address_2`,`provider_city`,`provider_state`,`provider_zip`,`provider_country`,`provider_phone`,`provider_email`,`provider_url`,`submitter_feedback`,`experience_rating`,`is_trans_experienced`,`accepts_ohp`,`accepts_private_insurance`,`insured_providers`,`accepts_medicare`,`accepts_scale_payments`,`scale_payment_desc`,`is_awareness_trained`,`awareness_training_date`,`awareness_trainer`,`required_trainees`),`has_more_than_m_f`,`pronoun_requested`,`preferred_name_requested`,`can_prescribe_hormones`,`letters_of_assistance`,`additional_comments`) VALUES (";
+		$entries = GFFormsModel::get_leads($form);
+		foreach($entries as $entry) {
+			$lead_id = $entry['id'];
+			$lead = RGFormsModel::get_lead( $lead_id ); 
+			if($entry['id'] == $_GET['id']) {
+				foreach($entry as $value) {
+					$send_it .= $value;
+				}
+			}
+		}
+		$send_it .= ");";
+		var_dump($send_it);
 	}
+	*/
+	//add_action( 'gform_post_submission_5', 'reviewed5', 10, 2 );
 ?>
