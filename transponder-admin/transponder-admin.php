@@ -3,104 +3,84 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.5 (MVP Alpha)
+*	Version: 0.4 (MVP Candidate)
 */
-<<<<<<< HEAD
-	add_action('admin_menu', 'transponder_admin_menu');
-	add_action('admin_enqueue_scripts','shinyStuff');
-	function my_custom_admin_head() {
-		echo "<script src='https://www.google.com/recaptcha/api.js'></script>";
-	}
-	add_action( 'admin_head', 'my_custom_admin_head' );
-	function shinyStuff() {
-		wp_register_style('transponder-admin',plugins_url('style.css',__FILE__ ));
-		wp_enqueue_style('transponder-admin', get_stylesheet_uri() );
-		wp_enqueue_scripts('transponder-admin', 'https://www.google.com/recaptcha/api.js');
-	}
-	function transponder_admin_menu() {
-		add_menu_page( 'Trans*ponder Posts', 'Trans*ponder', 'delete_posts', 'transponder-admin', 'transponder_pending', plugins_url('transponder-admin/includes/images/pluginicon.png'), 1 );
-		add_submenu_page('transponder-admin','Pending Submissions','Pending','delete_posts', 'transponder-admin','transponder_pending');
-		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_admin');
-	}
-	function transponder_admin() {
-		if(isset($_GET['create'])) {
-
-		} elseif(isset($_GET['edit'])) {
-
-		} else {
-			echo do_shortcode('[gravityform id="5" title="false" description="false"]');
-		}
-	}
-	/*
-	add_menu_page('My Custom Page', 'My Custom Page', 'manage_options', 'my-top-level-slug');
-	add_submenu_page( 'my-top-level-slug', 'My Custom Page', 'My Custom Page',
-		'manage_options', 'my-top-level-slug');
-	add_submenu_page( 'my-top-level-slug', 'My Custom Submenu Page', 'My Custom Submenu Page',
-		'manage_options', 'my-secondary-slug');
-	*/
-	function transponder_pending() {
-		if(isset($_GET['id'])){
-			$id = $_GET['id'];
-			review_submission($id);
-		} else {
-			echo "<h1>Pending Submissions</h1>";
-			$entries = GFFormsModel::get_leads(1);
-=======
 		
 	/*	Create a custom table to store all submissions after review
 	*	This table contains every field available on the admin 
 	*	view form
 	*/	
 	
-	function transponder_activate() {
-		global $wpdb;
-		$sql = "CREATE TABLE IF NOT EXISTS 
-		wp_a3t9xkcyny_serviceProviders (
-		  `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
-		  `lead_id` int(20) unsigned NOT NULL,
-		  `is_provider_submitted` BOOL NOT NULL,
-		  `service_type` TEXT(50) NOT NULL,
-		  `medical_type` TEXT(50),
-		  `mental_type` TEXT(50),
-		  `surgical_type` TEXT(50),
-		  `bodywork_type` TEXT(50),
-		  `provider_name` TEXT(50) NOT NULL,
-		  `office_name` TEXT(50),
-		  `provider_address` TEXT(50),
-		  `provider_address_2` TEXT(50),
-		  `provider_city` TEXT(50),
-		  `provider_state` TEXT(50),
-		  `provider_zip` TEXT(10),
-		  `provider_country` TEXT(10),
-		  `provider_phone` TINYINT(15),
-		  `provider_email` TEXT(25),
-		  `provider_url` TEXT(25),
-		  `submitter_feedback` TEXT(25),
-		  `experience_rating` TINYINT(10),
-		  `is_trans_experienced` BOOL NOT NULL,
-		  `accepts_ohp` BOOL NOT NULL,
-		  `accepts_private_insurance` BOOL NOT NULL,
-		  `insured_providers` TEXT(255),
-		  `accepts_medicare` BOOL NOT NULL,
-		  `accepts_scale_payments` BOOL NOT NULL,
-		  `scale_payment_desc` TEXT(255),
-		  `is_awareness_trained` BOOL NOT NULL,
-		  `awareness_training_date` DATE NULL,
-		  `awareness_trainer` TEXT(25),
-		  `required_trainees` TEXT(15),
-		  `has_more_than_m_f` BOOL NOT NULL,
-		  `pronoun_requested` BOOL NOT NULL,
-		  `preferred_name_requested` BOOL NOT NULL,
-		  `can_prescribe_hormones` BOOL,
-		  `letters_of_assistance` TEXT(25),
-		  `additional_comments` TEXT(10000),
-		  PRIMARY KEY (`id`),
-		  KEY `lead_id` (`lead_id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;";
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		$check = dbDelta($sql);
-	}
-	register_activation_hook(__FILE__, 'transponder_activate'); // When plugin is activated check and create the table if necessary
+    function create_providers_table() 
+    {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . "providers_table";
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = 'CREATE TABLE IF NOT EXISTS ' . $table_name . ' (
+            id int(20) unsigned NOT NULL AUTO_INCREMENT,
+            lead_id int(20) unsigned NOT NULL,
+            is_provider_submitted tinytext,
+            service_type text,
+            medical_type text,
+            mental_type text,
+            surgical_type text,
+            bodywork_type text,
+            provider_name text,
+            office_name text,
+            provider_address text,
+            provider_address_2 text,
+            provider_city text,
+            provider_state text,
+            provider_zip tinytext,
+            provider_country tinytext,
+            provider_phone text,
+            provider_email text,
+            provider_url text,
+            submitter_feedback text,
+            experience_rating tinyint(10),
+            is_trans_experienced tinytext,
+            accepts_ohp tinytext,
+            ohp_providers text,
+            accepts_private_insurance tinytext,
+            accepted_insurance text,
+            accepts_medicare tinytext,
+            accepts_scale_payments tinytext,
+            scale_payment_desc text,
+            is_awareness_trained tinytext,
+            awareness_training_date date,
+            awareness_trainer text,
+            required_trainees text,
+            has_more_than_m_f tinytext,
+            options_other_than_m_f text,
+            pronoun_requested tinytext,
+            preferred_name_requested tinytext,
+            can_prescribe_hormones tinytext,
+            letters_of_assistance text,
+            additional_comments text,
+            is_review_ready tinytext,
+            admin_first_name text,
+            admin_last_name text,
+            publish_to_web tinytext,
+            is_followup_needed tinytext,
+            followup_needed text,
+            archive_listing tinytext,
+            admin_listing_comments text,
+            post_title text,
+            post_body text,
+            post_tags text,
+            post_category text,
+
+            PRIMARY KEY  (id),
+            KEY lead_id (lead_id)
+            ) ' . $charset_collate . ';';
+        
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+    }
+    
+	register_activation_hook(__FILE__, 'create_providers_table'); // When plugin is activated check and create the table if necessary
 	add_action('admin_menu', 'transponder_admin_menu'); // Add Trans*ponder to the WordPress admin menu
 	add_action('admin_enqueue_scripts','shinyStuff'); // Apply a bit of polish and make things display a little better
 	function shinyStuff() {
@@ -114,7 +94,6 @@
 		add_submenu_page('transponder-admin','Pending Submissions','Pending','edit_posts', 'transponder-admin','transponder_pending');
 		add_submenu_page('transponder-admin','Admin','Admin','edit_users', 'transponder-admin-settings','transponder_vol');
 	}
-	/* DO NOT MODIFY BELOW */
 	/*
 	*	 Setup Custom Post Type for Approved Submissions
 	*/
@@ -154,8 +133,6 @@
 	}
 	add_action( 'pre_get_posts', 'get_taxonomy_queries' );
 	register_taxonomy_for_object_type('category', 'resourcesuggestions');
-	/* DO NOT MODIFY ABOVE */
-	
 	/*
 	*	This function is under development
 	*	Scope: Administrators should be able to add resources without review
@@ -236,7 +213,6 @@
 		} else {
 			echo "<h1>Pending Submissions</h1>";
 			$entries = GFFormsModel::get_leads(3);
->>>>>>> WordPress-PLugin
 			echo "<script> window.leadData = ".json_encode($entries).";</script>";
 			echo "<div id='formEntries'></div>";
 			?>
@@ -248,15 +224,6 @@
 				drawTable(leadData);
 			});
 			function drawTable(data) {
-<<<<<<< HEAD
-				var heading = jQuery("<tr />");
-				jQuery("#mytable").append(heading);
-				heading.append(jQuery("<td>Submitted At</td>"));
-				heading.append(jQuery("<td>Type of Services</td>"));
-				heading.append(jQuery("<td>Provider Type</td>"));
-				heading.append(jQuery("<td>Provider Name</td>"));
-				heading.append(jQuery("<td>Review</td>"));
-=======
 				
 				var heading = jQuery("<tr />");
 				jQuery("#mytable").append(heading);
@@ -265,27 +232,19 @@
 				heading.append(jQuery("<td class='heading'>Provider Type</td>"));
 				heading.append(jQuery("<td class='heading'>Provider Name</td>"));
 				heading.append(jQuery("<td class='heading'>Review</td>"));
->>>>>>> WordPress-PLugin
 				for (var i = 0; i < data.length; i++) {
 					drawRow(data[i]);
 				}
 			}
 			function drawRow(rowData) {
-<<<<<<< HEAD
-=======
 				console.log(rowData);
->>>>>>> WordPress-PLugin
 				var row = jQuery("<tr />");
 				jQuery("#mytable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
 				row.append(jQuery("<td>" + rowData['date_created'] + "</td>"));
 				row.append(jQuery("<td>" + rowData[2] + "</td>"));
 				row.append(jQuery("<td>" + rowData[3] + "</td>"));
 				row.append(jQuery("<td>" + rowData[7] + "</td>"));
-<<<<<<< HEAD
-				row.append(jQuery("<td><a href='admin.php?page=transponder-admin&id="+rowData['id']+"'>Start</a></td>"));
-=======
 				row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin-settings&id="+rowData['id']+"'>Start</a></td>"));
->>>>>>> WordPress-PLugin
 			}
 
 		</script>
@@ -293,25 +252,6 @@
 		}
 	}
 	function review_submission($id) {
-<<<<<<< HEAD
-		if(strcmp($id,'-1') == 0) {
-			return "Nothing to review";
-		}
-		$formData = $id;
-		$entries = GFFormsModel::get_leads($id);
-		echo "<script> window.leadData = ".json_encode($entries).";</script>";
-		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
-		?>
-		<script>
-			leadData.forEach(function (lead) {
-				Object.keys(lead).forEach(function (key) {
-					var fieldId = key.replace('.', '_');
-					jQuery('#input_3_'+fieldId).val(lead[key]);
-				})
-			})
-		</script>
-		<?php
-=======
 		/*	
 		*	This is our volunteer view, this allows them to review the submission we received and fill out more information as they talk with the provider
 		*/	
@@ -384,7 +324,6 @@
 		}
 		$send_it .= ");";
 		var_dump($send_it);
->>>>>>> WordPress-PLugin
 	}
 	*/
 	//add_action( 'gform_post_submission_5', 'reviewed5', 10, 2 );
