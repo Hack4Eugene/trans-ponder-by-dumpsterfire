@@ -7,7 +7,7 @@ Team Members:
 Ben Pearson           ben@idxbroker.com
 Aaron Flager          aaron@idxbroker.com
 Allen McNichols       allen@idxbroker.com
-Shannon Sallaway       shanon@idxbroker.com
+Shannon Sallaway      shannon@idxbroker.com
 Bishop Lafer          bishop@idxbroker.com
           frankie@idxbroker.com
 Seabastion Miller     seabastion.miller@gmail.com
