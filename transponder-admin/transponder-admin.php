@@ -324,7 +324,8 @@
 			if($entry['id'] == $_GET['id']) {
 				echo "<script> window.leadData = ".json_encode($entry).";</script>";
 			}
-		}
+        }
+        // Maybe add filter here?
 		echo do_shortcode('[gravityform id="3" title="false" description="false"]');
 		
 		?>
