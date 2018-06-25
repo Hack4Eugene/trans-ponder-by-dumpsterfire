@@ -358,7 +358,7 @@ class GW_Populate_Form {
 			if( $field->type == 'post_category' ) {
 				$value = explode( ':', $entry[ $field->id ] );
                 $entry[ $field->id ] = $value[1];
-                
+
                 // CodeGold: Get, then set the category to the serviceType
 
                 $categories = get_terms(
@@ -400,7 +400,6 @@ class GW_Populate_Form {
 						}
 						$entry[ $field->id ] = implode( ',', $list_values );
 					}
-
                     break;
                     
                 case 'select':
@@ -410,7 +409,7 @@ class GW_Populate_Form {
                     }
 
                     break;
-
+                      
                 case 'textarea':
                     // CodeGold: get the follow up and display if it exists
 			        if ($field->id === 45) {
