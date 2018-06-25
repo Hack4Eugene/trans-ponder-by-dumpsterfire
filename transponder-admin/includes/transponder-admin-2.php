@@ -347,17 +347,18 @@ class GW_Populate_Form {
 	}
 
 	public function prepare_entry_for_population( $entry ) {
-        // CodeGold: save the serviceType
+        // CodeGold: save the serviceType, follow up required
         $serviceType;
+        $followupReq;
 
 		$form = GFFormsModel::get_form_meta( $entry['form_id'] );
 
 		foreach( $form['fields'] as $field ) {
 
 			if( $field->type == 'post_category' ) {
-				//$value = explode( ':', $entry[ $field->id ] );
-                // $entry[ $field->id ] = $value[1];
-                
+				$value = explode( ':', $entry[ $field->id ] );
+                $entry[ $field->id ] = $value[1];
+
                 // CodeGold: Get, then set the category to the serviceType
 
                 $categories = get_terms(
@@ -399,18 +400,27 @@ class GW_Populate_Form {
 						}
 						$entry[ $field->id ] = implode( ',', $list_values );
 					}
-
-					break;
+                    break;
+                    
                 case 'select':
                     // CodeGold: get the serviceType
-                    if ($field->id === 2){
+                    if ($field->id === 2) {
                         $serviceType = $this->get_field_values_from_entry( $field, $entry );
                     }
 
                     break;
-			}
-
-		}
+                      
+                case 'textarea':
+                    // CodeGold: get the follow up and display if it exists
+			        if ($field->id === 45) {
+                        $followupReq = $this->get_field_values_from_entry( $field, $entry );
+                        if ( $followupReq !== '' ){
+                            echo "<br><b>Follow up required</b>: $followupReq <br>";
+                        } 
+                    }
+                    break;
+            }
+        }
 
 		return $entry;
 	}
