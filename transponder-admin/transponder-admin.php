@@ -165,7 +165,7 @@ require_once('includes/transponder-admin-2.php');
 				row.append(jQuery("<td>" + rowData[2] + "</td>"));
 				row.append(jQuery("<td>" + rowData[3] + rowData[4] + rowData[5] + rowData[6] + "</td>"));
 				row.append(jQuery("<td>" + rowData[7] + "</td>"));
-				row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-volunteer&user_type=volunteer&eid="+rowData['id']+"'>Start</a></td>"));
+				row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin&user_type=volunteer&eid="+rowData['id']+"'>Start</a></td>"));
 			}
 
 		</script>
@@ -226,7 +226,7 @@ require_once('includes/transponder-admin-2.php');
                     row.append(jQuery("<td>" + rowData[2] + "</td>"));
                     row.append(jQuery("<td>" + rowData[3] + rowData[4] + rowData[5] + rowData[6] + "</td>"));
                     row.append(jQuery("<td>" + rowData[7] + "</td>"));
-                    row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin&user_type=admin&eid="+rowData['id']+"'>Start</a></td>"));
+                    row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin-review&user_type=admin&eid="+rowData['id']+"'>Start</a></td>"));
                 }
     
             </script>
@@ -290,7 +290,7 @@ require_once('includes/transponder-admin-2.php');
                 row.append(jQuery("<td>" + rowData[7] + "</td>"));
                 row.append(jQuery("<td>" + rowData[40] + "</td>"));
                 row.append(jQuery("<td>" + rowData[42] + "</td>"));
-                row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-admin-settings&user_type=admin&eid="+rowData['id']+"'>Start</a></td>"));
+                row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-live-archived-list&user_type=admin&eid="+rowData['id']+"'>Start</a></td>"));
             }
 
             </script>
@@ -334,7 +334,11 @@ require_once('includes/transponder-admin-2.php');
                 'SELECT is_review_ready, followup_needed  FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
             );
             
-            if ( $data[0]->is_review_ready === 'Yes') {
+            if ( 
+                $data[0]->is_review_ready === 'Yes'
+                || $data[0]->followup_needed === 'Send to Archive'
+                || $data[0]->followup_needed === 'Send Back to Admin Verification List'
+            ) {
                 $show = false;
             } 
 
