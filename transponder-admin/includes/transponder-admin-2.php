@@ -323,7 +323,6 @@ class GW_Populate_Form {
 	}
 
 	public function prepare_form_for_population( $form ) {
-
 		foreach( $form['fields'] as &$field ) {
 
 			$field['allowsPrepopulate'] = true;
@@ -336,11 +335,10 @@ class GW_Populate_Form {
 				$field['inputs'] = $inputs;
 			}
 
-			// CodeGold: Don't set the user_type field from database
+            // CodeGold: Don't set the user_type field from database
             if($field['id'] !== 61) {
                 $field['inputName'] = $field['id'];
             }
-
 		}
 
 		return $form;
@@ -349,7 +347,6 @@ class GW_Populate_Form {
 	public function prepare_entry_for_population( $entry ) {
         // CodeGold: save the serviceType, follow up required
         $serviceType;
-        $followupReq;
 
 		$form = GFFormsModel::get_form_meta( $entry['form_id'] );
 
@@ -358,9 +355,8 @@ class GW_Populate_Form {
 			if( $field->type == 'post_category' ) {
 				$value = explode( ':', $entry[ $field->id ] );
                 $entry[ $field->id ] = $value[1];
-
+                
                 // CodeGold: Get, then set the category to the serviceType
-
                 $categories = get_terms(
                     array (
                         'taxonomy' => 'category',
@@ -400,6 +396,7 @@ class GW_Populate_Form {
 						}
 						$entry[ $field->id ] = implode( ',', $list_values );
 					}
+
                     break;
                     
                 case 'select':
@@ -409,9 +406,10 @@ class GW_Populate_Form {
                     }
 
                     break;
-                      
+
                 case 'textarea':
-                    // CodeGold: get the follow up and display if it exists
+                    // CodeGold: get the follow up and display on top if it exists
+                    $followupReq;
 			        if ($field->id === 45) {
                         $followupReq = $this->get_field_values_from_entry( $field, $entry );
                         if ( $followupReq !== '' ){
