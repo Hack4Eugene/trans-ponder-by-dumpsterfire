@@ -300,9 +300,18 @@ class GW_Populate_Form {
 		}
 
 		add_filter( 'gform_form_args', array( $this, 'prepare_field_values_for_population' ) );
-		add_filter( 'gform_entry_id_pre_save_lead', array( $this, 'set_submission_entry_id' ), 10, 2 );
+        add_filter( 'gform_entry_id_pre_save_lead', array( $this, 'set_submission_entry_id' ), 10, 2 );
+        // CodeGold: The user role should be set before form is displayed
+    }
+    
+    public function load_user_role($review_page, $form, $entry) {
 
-	}
+       /*  foreach($form['fields'] as &$field) {
+            if ($field->id === 65){
+                echo "<br> field id is " . $field->id . "<br>";
+            }
+        } */
+    }
 
 	public function prepare_field_values_for_population( $args ) {
 
@@ -338,6 +347,17 @@ class GW_Populate_Form {
             // CodeGold: Don't set the user_type field from database
             if($field['id'] !== 61) {
                 $field['inputName'] = $field['id'];
+            }
+
+            if($field['id'] === 65) {
+                // CodeGold: determine user capability
+                if (current_user_can('edit_users')) {
+                    $field['defaultValue'] = 'admin';
+                } elseif (current_user_can('edit_posts')) {
+                    $field['defaultValue'] = 'volunteer';
+                } else {
+                    $field['defaultValue'] = 'community';
+                }
             }
 		}
 
@@ -429,10 +449,11 @@ class GW_Populate_Form {
 
 		foreach( $entry as $input_id => $value ) {
 			$fid = intval( $input_id );
-			if( $fid == $field['id'] )
-				$values[] = $value;
+            if( $fid == $field['id'] )
+            {
+                $values[] = $value;
+            }
 		}
-
 		return count( $values ) <= 1 ? $values[0] : $values;
 	}
 
