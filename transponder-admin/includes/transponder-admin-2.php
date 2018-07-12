@@ -350,7 +350,7 @@ class GW_Populate_Form {
             if($field['id'] !== 61 && $field['id'] !== 66) {
                 $field['inputName'] = $field['id'];
             }
-
+      
             if($field['id'] === 66) {
                 // CodeGold: determine user capability and set the hidden user_level field
                 if (current_user_can('edit_users')) {
