@@ -14,7 +14,7 @@ require_once('includes/transponder-admin-2.php');
     
     // Apply a bit of polish and make things display a little better
     add_action('admin_enqueue_scripts','shinyStuff'); 
-    
+
     /* shinyStuff brings in our stylesheet so we can style the admin section without having to do a bunch of inline shenanigans */ 
     function shinyStuff() 
     {
@@ -322,7 +322,8 @@ require_once('includes/transponder-admin-2.php');
     /*
      * Community submited rows should only be visible to volunteers
      * if is_review_ready is not 'yes' or if it is, it is visible if
-     * the followup_needed is 'send back to volunteer'.
+     * the followup_needed is 'send back to volunteer', or if the second
+     * is_review_ready_2 is no.
      */
     function isCommVisible ($entryID)
     {
@@ -331,19 +332,22 @@ require_once('includes/transponder-admin-2.php');
         $show = true;
 
         $data=$wpdb->get_results(
-                'SELECT is_review_ready, followup_needed  FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
+                'SELECT is_review_ready, followup_needed, is_review_ready_2  FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
             );
             
             if ( 
                 $data[0]->is_review_ready === 'Yes'
                 || $data[0]->followup_needed === 'Send to Archive'
                 || $data[0]->followup_needed === 'Send Back to Admin Verification List'
+                || $data[0]->is_review_ready_2 === 'Yes'
             ) {
                 $show = false;
             } 
 
-            if ($data[0]->followup_needed === 'Send Back to Volunteer Verification List') 
-            {
+            if (
+                $data[0]->followup_needed === 'Send Back to Volunteer Verification List'
+                && $data[0]->is_review_ready_2 === 'No'
+            ) {
                 $show = true;
             }
             
@@ -361,15 +365,19 @@ require_once('includes/transponder-admin-2.php');
         $tableName = $wpdb->prefix . 'providers_table';
 
         $data=$wpdb->get_results(
-                'SELECT is_review_ready, publish_to_web, followup_needed, followup_needed FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
+                'SELECT is_review_ready, publish_to_web, followup_needed, followup_needed, is_review_ready_2 FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
             );
 
             if (
                 $data[0]->is_review_ready === 'No'
                 || $data[0]->is_review_ready === ''
-                || $data[0]->followup_needed === 'Send Back to Volunteer Verification List'
+                || (
+                    $data[0]->followup_needed === 'Send Back to Volunteer Verification List'
+                    && $data[0]->is_review_ready_2 === 'No'
+                )
                 || $data[0]->publish_to_web === 'Yes'
                 || $data[0]->followup_needed === 'Send to Archive'
+                || $data[0]->is_review_ready_2 === 'No'
             ) {
                 return false;
             } 

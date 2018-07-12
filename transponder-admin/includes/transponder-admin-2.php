@@ -13,7 +13,7 @@
 *   upon submission of the provider information form.
 */	
 
-register_activation_hook(__FILE__, 'create_providers_table'); 
+register_activation_hook('transponder-admin/transponder-admin.php', 'create_providers_table'); 
 add_action('gform_after_submission_12', 'add_or_update_entries_to_db', 10, 2);
 
 	/*	Create a custom table to store all submissions after review
@@ -95,11 +95,14 @@ function add_or_update_entries_to_db($entry, $form)
         'publish_to_web'            => $entry[40],      
         'followup_needed'           => $entry[42],          
         'reason_followup_needed'    => $entry[45],                   
+        'is_review_ready_2'         => $entry[68],
+        'volunteer_notes'           => $entry[67],
         'post_title'                => $entry[52],  
         'post_body'                 => $entry[53], 
         'post_tags'                 => $entry[54], 
         'post_category'             => $entry[55],
-        'last_user_type'            => $entry[61]
+        'last_user_type'            => $entry[61],
+        'last_user_level'           => $entry[66]
         )
     );
 }
@@ -162,11 +165,14 @@ function update_entries_in_db($entry, $form)
         'publish_to_web'            => $entry[40],      
         'followup_needed'           => $entry[42],          
         'reason_followup_needed'    => $entry[45],                   
+        'is_review_ready_2'         => $entry[68],
+        'volunteer_notes'           => $entry[67],
         'post_title'                => $entry[52],  
         'post_body'                 => $entry[53], 
         'post_tags'                 => $entry[54], 
         'post_category'             => $entry[55],
-        'last_user_type'            => $entry[61]
+        'last_user_type'            => $entry[61],
+        'last_user_level'           => $entry[66]
     );
 
     // Don't overwrite values with blank strings.
@@ -245,12 +251,15 @@ function create_providers_table()
         admin_last_name text,
         publish_to_web tinytext,
         followup_needed tinytext,
-        reason_followup_needed text,
-        post_title text,
-        post_body text,
-        post_tags text,
+        reason_followup_needed text,                   
+        is_review_ready_2 text,
+        volunteer_notes text,
+        post_title text,  
+        post_body text, 
+        post_tags text, 
         post_category text,
         last_user_type text,
+        last_user_level text,      
 
         PRIMARY KEY  (id),
         KEY lead_id (lead_id)
@@ -300,9 +309,8 @@ class GW_Populate_Form {
 		}
 
 		add_filter( 'gform_form_args', array( $this, 'prepare_field_values_for_population' ) );
-		add_filter( 'gform_entry_id_pre_save_lead', array( $this, 'set_submission_entry_id' ), 10, 2 );
-
-	}
+        add_filter( 'gform_entry_id_pre_save_lead', array( $this, 'set_submission_entry_id' ), 10, 2 );
+    }
 
 	public function prepare_field_values_for_population( $args ) {
 
@@ -324,6 +332,9 @@ class GW_Populate_Form {
 
 	public function prepare_form_for_population( $form ) {
 		foreach( $form['fields'] as &$field ) {
+            
+            // var_dump($form);
+            // echo "pre form for population. fieldid is: ". $field['id']. " <br>";
 
 			$field['allowsPrepopulate'] = true;
 
@@ -335,9 +346,23 @@ class GW_Populate_Form {
 				$field['inputs'] = $inputs;
 			}
 
-            // CodeGold: Don't set the user_type field from database
-            if($field['id'] !== 61) {
+            // CodeGold: Don't set the user_type or the user level fields from database
+            if($field['id'] !== 61 && $field['id'] !== 66) {
                 $field['inputName'] = $field['id'];
+            }
+
+            if($field['id'] === 66) {
+                // CodeGold: determine user capability and set the hidden user_level field
+                if (current_user_can('edit_users')) {
+                    // Should correlate to administrator level
+                    $field['defaultValue'] = 2;
+                } elseif (current_user_can('edit_posts')) {
+                    // Should correlate to volunteer level
+                    $field['defaultValue'] = 1;
+                } else {
+                    // Should correlate to commmunity level
+                    $field['defaultValue'] = 0;
+                }
             }
 		}
 
@@ -415,7 +440,8 @@ class GW_Populate_Form {
                         if ( $followupReq !== '' ){
                             echo "<br><b>Follow up required</b>: $followupReq <br>";
                         } 
-                    }
+                    } 
+
                     break;
             }
         }
@@ -429,10 +455,11 @@ class GW_Populate_Form {
 
 		foreach( $entry as $input_id => $value ) {
 			$fid = intval( $input_id );
-			if( $fid == $field['id'] )
-				$values[] = $value;
+            if( $fid == $field['id'] )
+            {
+                $values[] = $value;
+            }
 		}
-
 		return count( $values ) <= 1 ? $values[0] : $values;
 	}
 
@@ -466,3 +493,14 @@ new GW_Populate_Form( array(
     'form_id' => 12,
 	'update'  => true
 ) );
+
+/*
+
+Deleting entries
+
+In the database, run these queries:
+truncate wp_a3t9xkcyny_gf_entry_meta;
+truncate wp_a3t9xkcyny_gf_entry;
+truncate wp_a3t9xkcyny_providers_table;
+
+*/
