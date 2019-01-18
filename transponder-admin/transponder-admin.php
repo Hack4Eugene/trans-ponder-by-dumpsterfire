@@ -6,7 +6,7 @@ require_once('includes/transponder-admin-2.php');
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.4 (MVP Candidate)
+*	Version: 0.5 (MVP Candidate)
 */
 
     // Add Trans*ponder to the WordPress admin menu

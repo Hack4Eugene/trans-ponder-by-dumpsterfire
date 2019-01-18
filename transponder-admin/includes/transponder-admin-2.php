@@ -4,7 +4,7 @@
 *	Plugin Name: Trans*Ponder Volunteer/Admin Area
 *	Description: Form submission moderation section for publicly submitted resources
 *	Author: Team Dumpsterfire (Hack4acause 2018)
-*	Version: 0.4 (MVP Candidate)
+*	Version: 0.5 (MVP Candidate)
 */
 		
 /*	
@@ -102,7 +102,29 @@ function add_or_update_entries_to_db($entry, $form)
         'post_tags'                 => $entry[54], 
         'post_category'             => $entry[55],
         'last_user_type'            => $entry[61],
-        'last_user_level'           => $entry[66]
+        'last_user_level'           => $entry[66],
+        'has_explicit_incln_policy' => $entry[69],
+        'is_androgynous_welcome'    => $entry[70],
+        'has_gender_inclsv_bathrm'  => $entry[71],
+        'has_inclusive_activities'  => $entry[72],
+        'identifies_as_what_faith_1'   => $entry['73.1'],
+        'identifies_as_what_faith_2'   => $entry['73.2'],
+        'identifies_as_what_faith_3'   => $entry['73.3'],
+        'identifies_as_what_faith_4'   => $entry['73.4'],
+        'identifies_as_what_faith_5'   => $entry['73.5'],
+        'identifies_as_what_faith_6'   => $entry['73.6'],
+        'identifies_as_what_faith_7'   => $entry['73.7'],
+        'identifies_as_what_faith_8'   => $entry['73.8'],
+        'identifies_as_what_faith_9'   => $entry['73.9'],
+        'identifies_as_what_faith_10'  => $entry['73.10'],
+        'identifies_as_what_faith_11'  => $entry['73.11'],
+        'identifies_as_what_faith_12'  => $entry['73.12'],
+        'identifies_as_what_faith_13'  => $entry['73.13'],
+        'identifies_as_what_faith_14'  => $entry['73.14'],
+        'identifies_as_what_faith_15'  => $entry['73.15'],
+        'identifies_as_what_faith_16'  => $entry['73.16'],
+        'identifies_as_what_faith_17'  => $entry['73.17'],
+        'identifies_as_what_faith_18'  => $entry['73.18']
         )
     );
 }
@@ -172,7 +194,29 @@ function update_entries_in_db($entry, $form)
         'post_tags'                 => $entry[54], 
         'post_category'             => $entry[55],
         'last_user_type'            => $entry[61],
-        'last_user_level'           => $entry[66]
+        'last_user_level'           => $entry[66],
+        'has_explicit_incln_policy' => $entry[69],
+        'is_androgynous_welcome'    => $entry[70],
+        'has_gender_inclsv_bathrm'  => $entry[71],
+        'has_inclusive_activities'  => $entry[72],
+        'identifies_as_what_faith_1'  => $entry['73.1'],
+        'identifies_as_what_faith_2'  => $entry['73.2'],
+        'identifies_as_what_faith_3'  => $entry['73.3'],
+        'identifies_as_what_faith_4'  => $entry['73.4'],
+        'identifies_as_what_faith_5'  => $entry['73.5'],
+        'identifies_as_what_faith_6'  => $entry['73.6'],
+        'identifies_as_what_faith_7'  => $entry['73.7'],
+        'identifies_as_what_faith_8'  => $entry['73.8'],
+        'identifies_as_what_faith_9'  => $entry['73.9'],
+        'identifies_as_what_faith_10'  => $entry['73.10'],
+        'identifies_as_what_faith_11'  => $entry['73.11'],
+        'identifies_as_what_faith_12'  => $entry['73.12'],
+        'identifies_as_what_faith_13'  => $entry['73.13'],
+        'identifies_as_what_faith_14'  => $entry['73.14'],
+        'identifies_as_what_faith_15'  => $entry['73.15'],
+        'identifies_as_what_faith_16'  => $entry['73.16'],
+        'identifies_as_what_faith_17'  => $entry['73.17'],
+        'identifies_as_what_faith_18'  => $entry['73.18']
     );
 
     // Don't overwrite values with blank strings.
@@ -259,7 +303,29 @@ function create_providers_table()
         post_tags text, 
         post_category text,
         last_user_type text,
-        last_user_level text,      
+        last_user_level text,
+        has_explicit_incln_policy,
+        is_androgynous_welcome,
+        has_gender_inclsv_bathrm,
+        has_inclusive_activities, 
+        identifies_as_what_faith_1,       
+        identifies_as_what_faith_2,       
+        identifies_as_what_faith_3,       
+        identifies_as_what_faith_4,       
+        identifies_as_what_faith_5,       
+        identifies_as_what_faith_6,       
+        identifies_as_what_faith_7,       
+        identifies_as_what_faith_8,       
+        identifies_as_what_faith_9,       
+        identifies_as_what_faith_10,       
+        identifies_as_what_faith_11,       
+        identifies_as_what_faith_12,       
+        identifies_as_what_faith_13,       
+        identifies_as_what_faith_14,       
+        identifies_as_what_faith_15,       
+        identifies_as_what_faith_16,       
+        identifies_as_what_faith_17,       
+        identifies_as_what_faith_18,       
 
         PRIMARY KEY  (id),
         KEY lead_id (lead_id)
