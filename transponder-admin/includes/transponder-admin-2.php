@@ -433,14 +433,73 @@ class GW_Populate_Form {
 		}
 
 		return $form;
-	}
+    }
+    
+    public function collectPostValues ($entry_id) {
+        global $wpdb;
+        $post_title = '';
+        $post_content = '';
+
+        $post_service_type = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT service_type, other_service_type, provider_name FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                $entry_id
+            )
+        )[0];
+
+        $address_values = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                $entry_id
+            )
+        )[0];
+
+        $post_body_values = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT provider_phone, provider_email, provider_url, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                $entry_id
+            )
+        )[0];
+
+        foreach ($post_service_type as $field => $value) {
+            if ($value !== 'Other (provide detail below)') {
+                $post_title = $value;
+            }
+            if ($field === 'provider_name') {
+                $post_title = $value;
+            }
+        }
+
+        foreach ($address_values as $field => $value) {
+            if (!empty($value)) {
+                $address .= $value . ' ';
+            }
+        }
+
+        foreach ($post_body_values as $field => $value) {
+            if (!empty($value)) {
+                if ($field === 'provider_phone') {
+                    $post_content .= '<a href="tel:' . $value . '">' . $value . '</a><br>';
+                } elseif ($field === 'provider_email') {
+                    $post_content .= '<a href="mailto:' . $value . '">' . $value . '</a><br>';
+                } elseif ($field === 'provider_url') {
+                    $post_content .= '<a href="' . $value . '" target="_blank">' . $value . '</a><br>';
+                } else {
+                    $post_content .= $value . '<br>';
+                }
+            }
+        }
+
+        $post_content = $address . '<br>' . $post_content;
+        return [$post_title, $post_content];
+    }
 
 	public function prepare_entry_for_population( $entry ) {
-        // CodeGold: save the serviceType, follow up required
-        $serviceType;
+        // CodeGold: get all the values from the provider_table that goes into the cards.
+        $post_values = $this->collectPostValues($this->get_entry_id());
 
-		$form = GFFormsModel::get_form_meta( $entry['form_id'] );
-
+        $form = GFFormsModel::get_form_meta( $entry['form_id'] );
+        
 		foreach( $form['fields'] as $field ) {
 
 			if( $field->type == 'post_category' ) {
@@ -455,7 +514,15 @@ class GW_Populate_Form {
                         'name' => $serviceType
                     ));
                 $entry[ $field->id ] = $categories[0]->term_id;
-			}
+            }
+
+            if ($field->type === 'post_title') {
+                $entry[$field->id] = $post_values[0];
+            }
+            
+            if ($field->type === 'post_content') {
+                $entry[$field->id] = $post_values[1];
+            }
 
 			switch( GFFormsModel::get_input_type( $field ) ) {
 				case 'checkbox':
