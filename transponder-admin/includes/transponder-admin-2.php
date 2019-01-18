@@ -440,7 +440,7 @@ class GW_Populate_Form {
         $post_title = '';
         $post_content = '';
 
-        $post_service_type = $wpdb->get_results(
+        $post_service_type_values = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT service_type, other_service_type, provider_name FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
                 $entry_id
@@ -461,12 +461,11 @@ class GW_Populate_Form {
             )
         )[0];
 
-        foreach ($post_service_type as $field => $value) {
-            if ($value !== 'Other (provide detail below)') {
-                $post_title = $value;
-            }
+        foreach ($post_service_type_values as $field => $value) {
             if ($field === 'provider_name') {
                 $post_title = $value;
+            } elseif ($value !== 'Other (provide detail below)') {
+                 $post_service_type = $value;
             }
         }
 
@@ -490,7 +489,7 @@ class GW_Populate_Form {
             }
         }
 
-        $post_content = $address . '<br>' . $post_content;
+        $post_content = $post_service_type . '<br>' . $address . '<br>' . $post_content;
         return [$post_title, $post_content];
     }
 
