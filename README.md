@@ -43,3 +43,9 @@ We are using the following components:
 1. Add Service Type in forms
 1. Add category in the Posts > Categories (left menu bar)
 1. Edit the transponder-admin-2.php array called $translation in the get_category() method.
+
+### Steps for Adding a New Faith in the Drop Down Menu
+1. In the transponder-admin-2.php file, Add columns to the providers_table in three methods. The columns should be in the IDENTIFIES_AS_WHAT_FAITH_17 format, where the number part is incremented from what is already there.
+1. Add more checkbox items in the Gravity Form
+1. Insert new columns in the providers_table in database
+1. Add columns 
