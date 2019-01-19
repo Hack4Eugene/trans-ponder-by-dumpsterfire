@@ -37,7 +37,7 @@ We are using the following components:
 1. Log in as Volunteer or Admin
 1. Go to Posts (left menu bar)
 1. Filter by category
-1. Click trash button
+1. Click trash button on the post (card) you want to remove
 
 ### Steps for Adding a New Category (Service Type)
 1. Add Service Type in forms
