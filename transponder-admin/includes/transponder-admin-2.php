@@ -437,60 +437,113 @@ class GW_Populate_Form {
     
     public function collectPostValues ($entry_id) {
         global $wpdb;
-        $post_title = '';
+        $post_title = '<Provider Name>';
         $post_content = '';
+        $post_address = '';
+        $post_contact = '';
+        $post_category = 'Uncategorized';
 
-        $post_service_type_values = $wpdb->get_results(
+        $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT service_type, other_service_type, provider_name FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                "SELECT provider_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
                 $entry_id
             )
         )[0];
 
-        $address_values = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
-                $entry_id
-            )
-        )[0];
-
-        $post_body_values = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT provider_phone, provider_email, provider_url, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
-                $entry_id
-            )
-        )[0];
-
-        foreach ($post_service_type_values as $field => $value) {
-            if ($field === 'provider_name') {
-                $post_title = $value;
-            } elseif ($value !== 'Other (provide detail below)') {
-                 $post_service_type = $value;
-            }
-        }
-
-        foreach ($address_values as $field => $value) {
+        foreach ($results as $field => $value) {
             if (!empty($value)) {
-                $address .= $value . ' ';
-            }
-        }
-
-        foreach ($post_body_values as $field => $value) {
-            if (!empty($value)) {
-                if ($field === 'provider_phone') {
-                    $post_content .= '<a href="tel:' . $value . '">' . $value . '</a><br>';
-                } elseif ($field === 'provider_email') {
-                    $post_content .= '<a href="mailto:' . $value . '">' . $value . '</a><br>';
-                } elseif ($field === 'provider_url') {
-                    $post_content .= '<a href="' . $value . '" target="_blank">' . $value . '</a><br>';
-                } else {
-                    $post_content .= $value . '<br>';
+                switch ($field) {
+                    case 'provider_name':
+                        $post_title = $value; 
+                        break;
+                    case 'service_type':
+                        $post_category = $this->get_category($value);
+                        if ($value !== 'Other (provide detail below)') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'other_service_type':
+                        if ($value !== 'Other / Misc') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'medical_type':
+                        if ($value !== 'Other / Misc') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'mental_type':
+                        if ($value !== 'Other / Misc') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'surgical_type':
+                        if ($value !== 'Other / Misc') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'bodywork_type':
+                        if ($value !== 'Other / Misc') {
+                            $post_content .= $value . '<br>';
+                        }
+                        break;
+                    case 'other_provider_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'provider_address':
+                        $post_address .= $value;
+                        break;
+                    case 'provider_address_2':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_city':
+                        $post_address .= ' ' . $value . ',';
+                        break;
+                    case 'provider_state':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_zip':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_country':
+                        //$post_address .= ' ' . $value;
+                        break;
+                    case 'provider_phone':
+                        $post_contact .= '<a href="tel:' . $value . '">' . $value . '</a><br>';
+                        break;
+                    case 'provider_email':
+                        $post_contact .= '<a href="mailto:' . $value . '">' . $value . '</a><br>';
+                        break;
+                    case 'provider_url':
+                        $post_contact .= '<a href="' . $value . '" target="_blank">' . $value . '</a><br>';
+                        break;
                 }
             }
         }
 
-        $post_content = $post_service_type . '<br>' . $address . '<br>' . $post_content;
-        return [$post_title, $post_content];
+        $post_content = $post_content . '<br>' . $post_contact . '<br><a href="https://maps.google.com/?q=' . str_replace(',', '%2C', str_replace(' ', '+', $post_address)) . '" target="_blank">' . $post_address  .'</a>';
+
+        return [$post_title, $post_content, $post_category];
+    }
+
+    // Translate the categories in the form to the post categories.
+    public function get_category ($service_type) {
+        $translation = [
+            'Health / Beauty / Bodywork' => 'Bodywork',
+            'Culture' => 'Culture',
+            'Faith Based' => 'Faith',
+            'Medical' => 'Medical',
+            'Mental Health' => 'Mental Health',
+            'Support' => 'Support',
+            'Surgical' => 'Surgical',
+            'Other (provide detail below)' => 'Uncategorized'
+        ];
+
+        if (isset($translation[$service_type])) {
+            return $translation[$service_type];
+        } 
+
+        return 'Uncategorized';
     }
 
 	public function prepare_entry_for_population( $entry ) {
@@ -502,17 +555,18 @@ class GW_Populate_Form {
 		foreach( $form['fields'] as $field ) {
 
 			if( $field->type == 'post_category' ) {
-				$value = explode( ':', $entry[ $field->id ] );
-                $entry[ $field->id ] = $value[1];
+                $entry[ $field->id ] = $post_values[2];
+				// $value = explode( ':', $entry[ $field->id ] );
+                // $entry[ $field->id ] = $value[1];
                 
-                // CodeGold: Get, then set the category to the serviceType
+                // // CodeGold: Get, then set the category to the serviceType
                 $categories = get_terms(
                     array (
                         'taxonomy' => 'category',
                         'hide_empty' => false,
-                        'name' => $serviceType
+                        'name' => $post_values[2]
                     ));
-                $entry[ $field->id ] = $categories[0]->term_id;
+                $entry[$field->id] = $categories[0]->term_id;
             }
 
             if ($field->type === 'post_title') {
@@ -557,11 +611,6 @@ class GW_Populate_Form {
                     break;
                     
                 case 'select':
-                    // CodeGold: get the serviceType
-                    if ($field->id === 2) {
-                        $serviceType = $this->get_field_values_from_entry( $field, $entry );
-                    }
-
                     break;
 
                 case 'textarea':
