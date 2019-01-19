@@ -437,60 +437,92 @@ class GW_Populate_Form {
     
     public function collectPostValues ($entry_id) {
         global $wpdb;
-        $post_title = '';
+        $post_title = '<Provider Name>';
         $post_content = '';
+        $post_address = '';
+        $post_contact = '';
 
-        $post_service_type_values = $wpdb->get_results(
+        $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT service_type, other_service_type, provider_name FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                "SELECT provider_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
                 $entry_id
             )
         )[0];
 
-        $address_values = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
-                $entry_id
-            )
-        )[0];
-
-        $post_body_values = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT provider_phone, provider_email, provider_url, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
-                $entry_id
-            )
-        )[0];
-
-        foreach ($post_service_type_values as $field => $value) {
-            if ($field === 'provider_name') {
-                $post_title = $value;
-            } elseif ($value !== 'Other (provide detail below)') {
-                 $post_service_type = $value;
-            }
-        }
-
-        foreach ($address_values as $field => $value) {
+        foreach ($results as $field => $value) {
             if (!empty($value)) {
-                $address .= $value . ' ';
-            }
-        }
-
-        foreach ($post_body_values as $field => $value) {
-            if (!empty($value)) {
-                if ($field === 'provider_phone') {
-                    $post_content .= '<a href="tel:' . $value . '">' . $value . '</a><br>';
-                } elseif ($field === 'provider_email') {
-                    $post_content .= '<a href="mailto:' . $value . '">' . $value . '</a><br>';
-                } elseif ($field === 'provider_url') {
-                    $post_content .= '<a href="' . $value . '" target="_blank">' . $value . '</a><br>';
-                } else {
-                    $post_content .= $value . '<br>';
+                switch ($field) {
+                    case 'provider_name':
+                        $post_title = $value; 
+                        break;
+                    case 'service_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'other_service_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'medical_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'mental_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'surgical_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'bodywork_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'other_provider_type':
+                        $post_content .= $value . '<br>';
+                        break;
+                    case 'provider_address':
+                        $post_address .= $value;
+                        break;
+                    case 'provider_address_2':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_city':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_state':
+                        $post_address .= ', ' . $value;
+                        break;
+                    case 'provider_zip':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_country':
+                        $post_address .= ' ' . $value;
+                        break;
+                    case 'provider_phone':
+                        $post_contact .= '<a href="tel:' . $value . '">' . $value . '</a><br>';
+                        break;
+                    case 'provider_email':
+                        $post_contact .= '<a href="mailto:' . $value . '">' . $value . '</a><br>';
+                        break;
+                    case 'provider_url':
+                        $post_contact .= '<a href="' . $value . '" target="_blank">' . $value . '</a><br>';
+                        break;
                 }
             }
         }
 
-        $post_content = $post_service_type . '<br>' . $address . '<br>' . $post_content;
+        $post_content = $post_content . '<br>' . $post_contact . '<br><a href="https://maps.google.com/?q=' . str_replace(',', '%2C', str_replace(' ', '+', $post_address)) . '">' . $post_address '</a>';
+
         return [$post_title, $post_content];
+    }
+
+    // Translate the categories in the form to the post categories.
+    public function translate_category ($category) {
+        $translation = [
+            'Medical' => 'medical',
+            'Surgical' => 'surgical',
+            'Mental Health' => 'mental',
+            'Health / Beauty / Bodywork' => 'bodywork',
+            'Faith Based' => 'faith',
+            'Other (provide detail below)' => 'other'
+        ];
+        return $post_category;
     }
 
 	public function prepare_entry_for_population( $entry ) {
