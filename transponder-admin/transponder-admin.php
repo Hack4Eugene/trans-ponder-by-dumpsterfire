@@ -238,18 +238,15 @@ require_once('includes/transponder-admin-2.php');
     *	list_archived_and_live shows the entries that have been posted live or has been archived.
     */	
     function list_live_and_archived() {
-        $entries = [];
-        $entries = GFFormsModel::get_leads(12);
-
         if( rgget('eid') !== '' ){
             echo do_shortcode('[gravityform id=12 title="false" description="false"]');
         } else {
             echo "<h1>Live and Archived Entries</h1>";
 
-            // determine if each entry should be visible or not
-            addIsVisibleToEntries('laa', $entries);
+			// Grab the entries gtom database
+			$entries = retrieveLiveAndArchivedEntries();
 
-            echo "<script> window.leadData = ".json_encode($entries).";</script>";
+            echo "<script> window.entries = ".json_encode($entries).";</script>";
             echo "<div id='formEntries'></div>";
             ?>
         <script>
@@ -257,50 +254,68 @@ require_once('includes/transponder-admin-2.php');
             jQuery("#formEntries").append(tbl);
             jQuery("#mytable").attr("class","table");
             document.addEventListener("DOMContentLoaded", function(){
-                drawTable(leadData);
+                drawTable(entries);
             });
 
-            function drawTable(data) 
-            {
-                
+            function drawTable(entries) 
+            {     
                 var heading = jQuery("<tr />");
                 jQuery("#mytable").append(heading);
-                heading.append(jQuery("<td class='heading'>Submitted At</td>"));
+                heading.append(jQuery("<td class='heading'>id</td>"));
                 heading.append(jQuery("<td class='heading'>Type of Services</td>"));
                 heading.append(jQuery("<td class='heading'>Provider Type</td>"));
                 heading.append(jQuery("<td class='heading'>Provider Name</td>"));
                 heading.append(jQuery("<td class='heading'>Publish to Web</td>"));
                 heading.append(jQuery("<td class='heading'>Follow Up Status</td>"));
                 heading.append(jQuery("<td class='heading'>Edit</td>"));
-                for (var i = 0; i < data.length; i++) {
-                    if(data[i]['visible'] !== false) {
-                        drawRow(data[i]);
-                    }
+                for (var i = 0; i < entries.length; i++) {
+                    drawRow(entries[i]);
                 }
             }
 
             function drawRow(rowData) 
             {
-                // console.log(rowData);
                 var row = jQuery("<tr />");
                 jQuery("#mytable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
-                row.append(jQuery("<td>" + rowData['date_created'] + "</td>"));
-                row.append(jQuery("<td>" + rowData[2] + "</td>"));
-                row.append(jQuery("<td>" + rowData[3] + rowData[4] + rowData[5] + rowData[6] + "</td>"));
-                row.append(jQuery("<td>" + rowData[7] + "</td>"));
-                row.append(jQuery("<td>" + rowData[40] + "</td>"));
-                row.append(jQuery("<td>" + rowData[42] + "</td>"));
-                row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-live-archived-list&user_type=admin&eid="+rowData['id']+"'>Start</a></td>"));
+				// id
+                row.append(jQuery("<td>" + rowData.id + "</td>"));
+				// Type of Services
+                row.append(jQuery("<td>" + rowData.service_type + rowData.other_service_type + "</td>"));
+				// Provider Type
+                row.append(jQuery("<td>" + rowData.medical_type + rowData.mental_type + 
+					rowData.surgical_type + rowData.bodywork_type + rowData.other_provider_type + "</td>"));
+				// Provider Name
+                row.append(jQuery("<td>" + rowData.provider_name + "</td>"));
+				// Publish to Web?
+                row.append(jQuery("<td>" + rowData.publish_to_web + "</td>"));
+				// Follow Up Status
+                row.append(jQuery("<td>" + rowData.followup_needed + "</td>"));
+				// Click to Edit entry
+                row.append(jQuery("<td><a class='button' href='admin.php?page=transponder-live-archived-list&user_type=admin&eid="+rowData.id +"'>Start</a></td>"));
             }
 
             </script>
             <?php
             }
         }
+	
+	/*
+	* Query the providers_table in the database for Live and Archived entries.
+	*/
+	function retrieveLiveAndArchivedEntries()
+	{
+		global $wpdb; 
+        $tableName = $wpdb->prefix . 'providers_table';
+		
+		return $wpdb->get_results(
+			'SELECT id, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, provider_name, publish_to_web, followup_needed FROM ' . 
+			$tableName . ' WHERE publish_to_web = "Yes" OR followup_needed = "Send to Archive"'
+		);
+	}
 
     /*
      * Given the form type (volunteer or admin), determine
-     * if it should be on the Volunteer's or Admin's Pending Lists or no list.
+     * if it should be on the Volunteer's/Admin's Pending or Live/Archived Lists
      */
     function addIsVisibleToEntries($formType, & $entriesArray)
     {
@@ -311,10 +326,6 @@ require_once('includes/transponder-admin-2.php');
 
             if ($formType === 'vol') {
                 $entry['visible'] = isVolVisible($entry['id']);
-            }
-
-            if ($formType === 'laa') {
-                $entry['visible'] = isLaaVisible($entry['id']);
             }
         }
     }
@@ -382,26 +393,4 @@ require_once('includes/transponder-admin-2.php');
                 return false;
             } 
             return true;
-    }
-
-    /*
-     * live and archived entries are visible if followup_needed === 'Send to Archive' or 
-     * publish_to_web = 'Yes'
-     */
-    function isLaaVisible ($entryID)
-    {
-        global $wpdb; 
-        $tableName = $wpdb->prefix . 'providers_table';
-
-        $data=$wpdb->get_results(
-                'SELECT is_review_ready, publish_to_web, followup_needed, followup_needed FROM ' . $tableName . ' WHERE lead_id = ' . $entryID 
-            );
-
-            if (
-                $data[0]->publish_to_web === 'Yes'
-                || $data[0]->followup_needed === 'Send to Archive'
-            ) {
-                return true;
-            } 
-            return false;
     }
