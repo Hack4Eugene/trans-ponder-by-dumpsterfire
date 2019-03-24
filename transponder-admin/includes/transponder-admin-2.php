@@ -442,10 +442,11 @@ class GW_Populate_Form {
         $post_address = '';
         $post_contact = '';
         $post_category = 'Uncategorized';
+        $post_content_insurance = '';
 
         $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT provider_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                "SELECT provider_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, accepts_ohp, accepts_private_insurance, accepts_medicare, accepts_scale_payments, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
                 $entry_id
             )
         )[0];
@@ -487,8 +488,25 @@ class GW_Populate_Form {
                             $post_content .= $value . '<br>';
                         }
                         break;
-                    case 'other_provider_type':
-                        $post_content .= $value . '<br>';
+                    case 'accepts_ohp':
+                        if ($value === 'Yes') {
+                            $post_content_insurance .= ', OHP';
+                        }
+                        break;
+                    case 'accepts_private_insurance':
+                        if ($value === 'Yes') {
+                            $post_content_insurance .= ', private insurance';
+                        }
+                        break;
+                    case 'accepts_medicare':
+                        if ($value === 'Yes') {
+                            $post_content_insurance .= ', Medicare';
+                        }
+                        break;
+                    case 'accepts_scale_payments':
+                        if ($value === 'Yes') {
+                            $post_content_insurance .= ', sliding scale payments';
+                        }
                         break;
                     case 'provider_address':
                         $post_address .= $value;
@@ -521,7 +539,15 @@ class GW_Populate_Form {
             }
         }
 
-        $post_content = $post_content . '<br>' . $post_contact . '<br><a href="https://maps.google.com/?q=' . str_replace(',', '%2C', str_replace(' ', '+', $post_address)) . '" target="_blank">' . $post_address  .'</a>';
+        $post_content = $post_content . '<br>';
+        
+        if ($post_content_insurance !== '') {
+            $post_content .= 'Accepted insurance: ' . substr($post_content_insurance, 2) . '<br>';
+        }
+        
+        $post_content .= $post_contact . '<br><a href="https://maps.google.com/?q=' .
+            str_replace(',', '%2C', str_replace(' ', '+', $post_address)) .
+            '" target="_blank">' . $post_address  .'</a>';
 
         return [$post_title, $post_content, $post_category];
     }
