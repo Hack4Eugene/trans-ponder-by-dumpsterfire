@@ -452,9 +452,6 @@ class GW_Populate_Form {
                         break;
                     case 'service_type':
                         $post_category = $this->get_category($value);
-                        if ($value !== 'Other (provide detail below)') {
-                            $post_content .= $value . '<br>';
-                        }
                         break;
                     case 'other_service_type':
                         if ($value !== 'Other / Misc') {
