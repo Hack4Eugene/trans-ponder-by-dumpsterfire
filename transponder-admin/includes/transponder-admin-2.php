@@ -357,7 +357,6 @@ function create_providers_table()
 class GW_Populate_Form {
 
 	public function __construct( $args = array() ) {
-
 		$this->_args = wp_parse_args( $args, array(
 			'form_id'   => false,
 			'query_arg' => 'eid',
@@ -369,7 +368,6 @@ class GW_Populate_Form {
 	}
 
 	public function init() {
-
 		if( ! property_exists( 'GFCommon', 'version' ) || ! version_compare( GFCommon::$version, '1.8', '>=' ) ) {
 			return;
 		}
@@ -379,7 +377,6 @@ class GW_Populate_Form {
     }
 
 	public function prepare_field_values_for_population( $args ) {
-
 		if( ! $this->is_applicable_form( $args['form_id'] ) || ! $this->get_entry_id() ) {
 			return $args;
 		}
@@ -398,10 +395,6 @@ class GW_Populate_Form {
 
 	public function prepare_form_for_population( $form ) {
 		foreach( $form['fields'] as &$field ) {
-            
-            // var_dump($form);
-            // echo "pre form for population. fieldid is: ". $field['id']. " <br>";
-
 			$field['allowsPrepopulate'] = true;
 
 			if( is_array( $field['inputs'] ) ) {
@@ -446,7 +439,7 @@ class GW_Populate_Form {
 
         $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT provider_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, accepts_ohp, accepts_private_insurance, accepts_medicare, accepts_scale_payments, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
+                "SELECT provider_name, office_name, service_type, other_service_type, medical_type, mental_type, surgical_type, bodywork_type, other_provider_type, accepts_ohp, accepts_private_insurance, accepts_medicare, accepts_scale_payments, provider_address, provider_address_2, provider_city, provider_state, provider_zip, provider_country, provider_phone, provider_email, provider_url FROM wp_a3t9xkcyny_providers_table WHERE lead_id = %d",
                 $entry_id
             )
         )[0];
@@ -487,6 +480,9 @@ class GW_Populate_Form {
                         if ($value !== 'Other / Misc') {
                             $post_content .= $value . '<br>';
                         }
+                        break;
+                    case 'office_name':
+                        $post_content .= $value . '<br>'; 
                         break;
                     case 'accepts_ohp':
                         if ($value === 'Yes') {
@@ -582,9 +578,7 @@ class GW_Populate_Form {
 
 			if( $field->type == 'post_category' ) {
                 $entry[ $field->id ] = $post_values[2];
-				// $value = explode( ':', $entry[ $field->id ] );
-                // $entry[ $field->id ] = $value[1];
-                
+
                 // // CodeGold: Get, then set the category to the serviceType
                 $categories = get_terms(
                     array (
@@ -605,7 +599,6 @@ class GW_Populate_Form {
 
 			switch( GFFormsModel::get_input_type( $field ) ) {
 				case 'checkbox':
-
 					$values = $this->get_field_values_from_entry( $field, $entry );
 					if( is_array( $values ) ) {
 						$value = implode( ',', array_filter( $values ) );
@@ -613,14 +606,10 @@ class GW_Populate_Form {
 						$value = $values;
 					}
 					$entry[$field['id']] = $value;
-
 					break;
-
 				case 'list':
-
 					$value = maybe_unserialize( rgar( $entry, $field->id ) );
 					$list_values = array();
-
 					if( is_array( $value ) ) {
 						foreach( $value as $vals ) {
 							if( is_array( $vals ) ) {
@@ -633,12 +622,9 @@ class GW_Populate_Form {
 						}
 						$entry[ $field->id ] = implode( ',', $list_values );
 					}
-
                     break;
-                    
                 case 'select':
                     break;
-
                 case 'textarea':
                     // CodeGold: get the follow up and display on top if it exists
                     $followupReq;
@@ -648,16 +634,13 @@ class GW_Populate_Form {
                             echo "<br><b>Follow up required</b>: $followupReq <br>";
                         } 
                     } 
-
                     break;
             }
         }
-
 		return $entry;
 	}
 
 	public function get_field_values_from_entry( $field, $entry ) {
-
 		$values = array();
 
 		foreach( $entry as $input_id => $value ) {
@@ -671,7 +654,6 @@ class GW_Populate_Form {
 	}
 
 	public function set_submission_entry_id( $entry_id, $form ) {
-
 		if( ! $this->is_applicable_form( $form['id'] ) || ! $this->get_entry_id() ) {
 			return $entry_id;
 		}
@@ -686,7 +668,6 @@ class GW_Populate_Form {
 	}
 
 	public function is_applicable_form( $form ) {
-
 		$form_id = isset( $form['id'] ) ? $form['id'] : $form;
 
 		return ! $this->_args['form_id'] || $form_id == $this->_args['form_id'];
