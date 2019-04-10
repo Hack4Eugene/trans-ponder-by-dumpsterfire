@@ -393,7 +393,7 @@ if ($query->have_posts()):
 		if ( is_category() ) { $term = get_queried_object(); }
 	?>
 		<form method="get" id="search_form" action="<?php echo home_url(); ?>">
-		<div>
+
 		<input type="text" value="" name="s" id="s" />
 	<?php
 		if ($term) {
@@ -405,15 +405,29 @@ if ($query->have_posts()):
 		} 
 	?>
 		<input type="submit" id="search_submit" name="Search" value="<?php echo $btn; ?>"/>
-		</div>
 		</form>
+		
 	<?php
 
-	echo '</div>
-          <div class="post-wrapper">
+		// frankie-added check-box form that uses tags as filters.
+		$postTags = get_the_tags();
+	?>
+		
+		<form method="get" id="filter_form" action="<?php echo home_url(); ?>">
+		
+	<?php
+		foreach ($postTags as $tag) {
+			echo '<input type="checkbox" name="tag" value="'.$tag->slug.'">'.
+			$tag->name;			
+		}
+			echo '<input type="submit" value="Filter by Tags"/>
+		</form>
+		</div>
+		
+		<div class="post-wrapper">
           	<div class="post-body">' . do_shortcode($the_content) . '</div>' .
           	$navigation_content . '
-          </div>
+        </div>
         </div>';
 
 // end of the loop.
