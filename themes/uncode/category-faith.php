@@ -415,24 +415,23 @@ if ($query->have_posts()):
 		// frankie-added list tags as checkboxes.
 	?>
 	<script> 
-		function getCheckedTags() {
-			let tagCheckboxes = document.getElementsByName('tagCheckbox');
-			let checkedTags = "?tags=";
-			for(let i=0; i<tagCheckboxes.length; i++) {
-				if (tagCheckboxes[i].type==='checkbox' && tagCheckboxes[i].checked === true) {
-					checkedTags += tagCheckboxes[i].value + ",";
-				}
+		function getSelectedTags() {
+			let itemList = document.getElementById('multi-select-dropdown');
+			let collection = itemList.selectedOptions;
+			let selectedTags = "?tags=";
+			for(let i=0; i<collection.length; i++) {
+				selectedTags += collection[i].value + ",";
 			}
 			let categoryPath = location.href.slice(0, location.href.indexOf('?'))
-			location.href = categoryPath + '/' + checkedTags.slice(0,-1);
+			location.href = categoryPath + '/' + selectedTags.slice(0,-1);
 		}
-	</script>
+	</script><select id="multi-select-dropdown" multiple>
 	<?php
 		foreach ($categoryTags as $tag) {
-			echo '<input class="checkbox" type="checkbox" name="tagCheckbox" value="'
-				. $tag->tag_slug . '"> ' . $tag->tag_name . '  ';			
+			echo '<option value="'
+				. $tag->tag_slug . '"> ' . $tag->tag_name . '</option>';			
 		}
-			echo '<br><input type="button" onclick="getCheckedTags()" value="Filter by Tags">
+			echo '</select><input type="button" onclick="getSelectedTags()" value="Filter by Tags">
 
 		</div>
 		
