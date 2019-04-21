@@ -56,6 +56,7 @@ We are using the following components:
 1. Add Service Type in forms
 1. Add category in the Posts > Categories (left menu bar)
 1. Edit the transponder-admin-2.php array called $translation in the get_category() method. This will translate what the Post Categories are named and the Category submitted through the form
+1. Category pages will need to be added such that filters and search will work. Create a category page like the categories pages located in wp-content/themes/uncode
 
 ### Steps for Deleting a Resource Submission
 1. Identify the ENTRY_ID and delete all rows with that ENTRY_ID in the wp_a3t9xkcyny_gf_entry_meta table
