@@ -1,6 +1,6 @@
 <?php
 /**
- * A template file for the faith category slug.
+ * A template file for the mental-health category slug.
  *
  * This was taken from archive.php, the most generic template file in a 
  * WordPress theme.
@@ -400,12 +400,13 @@ if ($query->have_posts()):
 		$btn = sprintf( __('Search in %s'), $term->name);
 	?>
 		<input type="hidden" value="<?php echo $term->term_id; ?>" name="cat" />
-		<input type="hidden" value="<?php echo $term->name; ?>" name="catname" />
 	<?php 
 		} 
 	?>
 		<input type="submit" id="search_submit" name="Search" value="<?php echo $btn; ?>"/>
 		</form>
+
+		
 		</div><div class="filter">
 		
 	<?php

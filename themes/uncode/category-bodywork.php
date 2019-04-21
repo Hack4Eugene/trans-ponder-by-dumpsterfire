@@ -1,6 +1,6 @@
 <?php
 /**
- * A template file for the faith category slug.
+ * A template file for the bodywork category slug.
  *
  * This was taken from archive.php, the most generic template file in a 
  * WordPress theme.
