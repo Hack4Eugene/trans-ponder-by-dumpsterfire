@@ -422,19 +422,30 @@ if ($query->have_posts()):
 			for(let i=0; i<collection.length; i++) {
 				selectedTags += collection[i].value + ",";
 			}
-			let categoryPath = location.href.slice(0, location.href.indexOf('?'))
+			let categoryPath = location.href.slice(0, location.href.indexOf('?'));
 			location.href = categoryPath + '/' + selectedTags.slice(0,-1);
+		}
+		function seeAllPosts() {
+			let markLoc = location.href.indexOf('?');
+			if (markLoc > 0) {
+				location.href = location.href.slice(0, markLoc);
+			} else {
+				alert("All posts are shown below.");
+			}
 		}
 	</script><select id="multi-select-dropdown" multiple>
 	<?php
+		$tagsArray = explode(',',$tags);
 		foreach ($categoryTags as $tag) {
-			echo '<option value="'
-				. $tag->tag_slug . '"> ' . $tag->tag_name . '</option>';			
+			if (in_array($tag->tag_slug, $tagsArray)) {
+				echo '<option value="' . $tag->tag_slug . '" selected>' . $tag->tag_name . '</option>';
+			} else {
+				echo '<option value="' . $tag->tag_slug . '">' . $tag->tag_name . '</option>';
+			}
 		}
-			echo '</select><input type="button" onclick="getSelectedTags()" value="Filter by Tags">
-
+			echo '</select><input type="button" onclick="getSelectedTags()" value="filter by...">
+				<input type="button" onclick="seeAllPosts()" value="see all posts">
 		</div>
-		
 		<div class="post-wrapper">
           	<div class="post-body">' . do_shortcode($the_content) . '</div>' .
           	$navigation_content . '
